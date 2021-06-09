@@ -1,4 +1,6 @@
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+
 from store.models import Book
 from store.serializer import BookSerializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -12,3 +14,4 @@ class BookViewSet(viewsets.ModelViewSet):
     filter_fields = ['price']
     search_fields = ['name', 'author']
     ordering_fields = ['price', 'author']
+    permission_classes = [IsAuthenticated]
