@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
@@ -15,3 +16,7 @@ class BookViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'author']
     ordering_fields = ['price', 'author']
     permission_classes = [IsAuthenticated]
+
+
+def auth(request):
+    return render(request, 'oauth.html')
