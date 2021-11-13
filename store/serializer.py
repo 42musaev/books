@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from store.models import Book
+from store.models import Book, UserBookRelation
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -10,4 +10,15 @@ class BookSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'price',
+        )
+
+
+class UserBookRelationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserBookRelation
+        fields = (
+            'book',
+            'like',
+            'in_bookmarks',
+            'rate'
         )

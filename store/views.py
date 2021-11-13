@@ -1,15 +1,16 @@
 from django.shortcuts import render
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.mixins import UpdateModelMixin
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
-from store.models import Book
+from store.models import Book, UserBookRelation
 from store.permisions import IsOwnerOrReadOnly
-from store.serializer import BookSerializer
+from store.serializer import BookSerializer, UserBookRelationSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
 
-class BookViewSet(viewsets.ModelViewSet):
+class BookViewSet(ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -23,6 +24,20 @@ class BookViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.validated_data["owner"] = self.request.user
         serializer.save()
+
+
+class UserBookRelationView(UpdateModelMixin, GenericViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = UserBookRelation.objects.all()
+    serializer_class = UserBookRelationSerializer
+    lookup_field = 'book'
+
+    def get_object(self):
+        obj, _ = UserBookRelation.objects.get_or_create(
+            user_id=self.request.user.id,
+            book_id=self.kwargs['book']
+        )
+        return obj
 
 
 def auth(request):
