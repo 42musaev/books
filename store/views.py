@@ -1,5 +1,5 @@
 from django.db.models.aggregates import Avg, Count
-from django.db.models.expressions import Case, When
+from django.db.models.expressions import F, Case, When
 from django.shortcuts import render
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -11,12 +11,13 @@ from store.serializer import BookSerializer, UserBookRelationSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
-
 class BookViewSet(ModelViewSet):
     queryset = (
         Book.objects.all()
         .annotate(
             annotated_likes=Count(Case(When(userbookrelation__like=True, then=1))),
+            annotated_in_bookmarks=Count(Case(When(userbookrelation__in_bookmarks=True, then=1))),
+            discount_price=F('price') - F('discount'),
             rating=Avg("userbookrelation__rate"),
         )
         .order_by("id")
